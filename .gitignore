@@ -174,4 +174,3 @@ dmypy.json
 cython_debug/
 
 # Metatrader executables
-*.ex5
