@@ -84,7 +84,7 @@ int OnCalculate(const int rates_total,
 
    if(prev_calculated == 0)
      {
-      start = 1;  // start filling out MTMBuffer[] and AbsMTMBuffer[] from the 1st index
+      start = 1;  // start filling from the 1st index
      }
    else
      {
