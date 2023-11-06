@@ -12,12 +12,12 @@
 //---- plot TSI
 #property indicator_label1  "StochasticRSI"
 #property indicator_type1   DRAW_LINE
-#property indicator_color1  Blue
+#property indicator_color1  clrYellow
 #property indicator_style1  STYLE_SOLID
 #property indicator_width1  1
-#property indicator_applied_price PRICE_TYPICAL
 //--- input parameters
-input int      lookBack=14;
+input int               lookBack=14;
+input ENUM_TIMEFRAMES   TimeFrame=PERIOD_CURRENT;
 //--- indicator buffers
 double         StochasticRSIBuffer[];
 double         RSIBuffer[];
@@ -33,19 +33,19 @@ int OnInit()
    SetIndexBuffer(0,StochasticRSIBuffer,INDICATOR_DATA);
    SetIndexBuffer(1, RSIBuffer, INDICATOR_CALCULATIONS);
 
-   RSIHandler = iRSI(Symbol(), PERIOD_CURRENT, lookBack, PRICE_CLOSE);
+   RSIHandler = iRSI(Symbol(), TimeFrame, lookBack, PRICE_CLOSE);
 
    if(RSIHandler == INVALID_HANDLE)
      {
       return INIT_FAILED;
      }
-     
-     //--- bar, starting from which the indicator is drawn
-   PlotIndexSetInteger(0,PLOT_DRAW_BEGIN,lookBack-1);
+
+//--- bar, starting from which the indicator is drawn
+//PlotIndexSetInteger(0,PLOT_DRAW_BEGIN,lookBack-1);
    string shortname;
    StringConcatenate(shortname,"stochasticRSI(",lookBack,")");
 //--- set a label do display in DataWindow
-   PlotIndexSetString(0,PLOT_LABEL,shortname);   
+   PlotIndexSetString(0,PLOT_LABEL,shortname);
 //--- set a name to show in a separate sub-window or a pop-up help
    IndicatorSetString(INDICATOR_SHORTNAME,shortname);
 //--- set accuracy of displaying the indicator values
@@ -95,13 +95,13 @@ int OnCalculate(const int rates_total,
      {
       double tempArray[];
 
-      if(i < lookBack)
+      if(i < lookBack + 1)
         {
          StochasticRSIBuffer[i] = 0;
          continue;
         }
 
-      arraySlice(RSIBuffer, tempArray, rates_total - lookBack, rates_total);
+      arraySlice(RSIBuffer, tempArray, i - lookBack, i);
 
       double minRSIValue = arrayMathMinValue(tempArray);
       double maxRSIValue = arrayMathMaxValue(tempArray);
@@ -112,15 +112,15 @@ int OnCalculate(const int rates_total,
         {
          StochasticRSIBuffer[i] = 100;
         }
-      else
-         if(stochastiRSIValue < 0)
-           {
-            StochasticRSIBuffer[i] = 0;
-           }
-         else
-           {
-            StochasticRSIBuffer[i] = stochastiRSIValue;
-           }
+
+      if(stochastiRSIValue < 0)
+        {
+         StochasticRSIBuffer[i] = 0;
+        }
+      if (stochastiRSIValue <= 100 && stochastiRSIValue > 0)
+        {
+         StochasticRSIBuffer[i] = stochastiRSIValue;
+        }
 
      }
 
